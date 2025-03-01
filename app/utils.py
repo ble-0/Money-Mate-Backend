@@ -1,13 +1,11 @@
 
 import re
 
-def parse_mpesa_message(content):
-    pattern = r"Amount: (\d+(\.\d{1,2})?)\s*Date: (\d{2}/\d{2}/\d{4})\s*Type: (\w+)"
-    match = re.search(pattern, content)
+def parse_mpesa_sms(sms_content):
 
-    if match:
-        amount = float(match.group(1))
-        date = match.group(3)
-        transaction_type = match.group(4)
-        return amount, date, transaction_type
-    return None, None, None
+    amount_match = re.search(r"received KSh (\d+)", sms_content)
+    if amount_match:
+        amount = float(amount_match.group(1))
+        transaction_type = "deposit"  or "transfered"
+        return amount,  transaction_type
+    return None, None
