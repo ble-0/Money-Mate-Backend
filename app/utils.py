@@ -9,3 +9,5 @@ def parse_mpesa_sms(sms_content):
         transaction_type = "deposit"  or "transfered"
         return amount,  transaction_type
     return None, None
+
+

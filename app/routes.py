@@ -1,7 +1,7 @@
 
 from flask import request, jsonify
 from app import app, db
-from app. models import User, Transaction
+from app import User, Transaction
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
@@ -9,7 +9,12 @@ import re
 from sqlalchemy.exc import SQLAlchemyError
 from flask import Blueprint
 
-routes = Blueprint('routes', __name__)
+
+routes_blueprint = Blueprint('routes', __name__)
+@routes.route('/')
+def home():
+    return "Welcome to Money Mate!"
+
 # Helper function to validate email
 def is_valid_email(email):
     email_regex = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
@@ -187,3 +192,6 @@ def delete_transaction(id):
         return jsonify({"msg": "Failed to delete transaction"}), 500
 
     return jsonify({"msg": "Transaction deleted successfully"}), 200
+
+
+
