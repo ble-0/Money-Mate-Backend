@@ -1,18 +1,12 @@
-from flask_sqlalchemy import SQLAlchemy
 from app.extensions import db
-from app.models.user import User
-from app.models.category import Category
+from datetime import datetime
 
 class Transaction(db.Model):
-    __tablename__ = 'transactions'
-
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=False)
-    amount = db.Column(db.Numeric(10, 2), nullable=False)
-    transaction_type = db.Column(db.Enum('income', 'expense', name='transaction_type'), nullable=False)
-    timestamp = db.Column(db.DateTime, nullable=False, server_default=db.func.now())
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    amount = db.Column(db.Float, nullable=False)
+    category = db.Column(db.String(50), nullable=False)
+    type = db.Column(db.String(20), nullable=False)  # 'income' or 'expense'
+    date = db.Column(db.DateTime, default=datetime.utcnow)
 
-    user = db.relationship('User', back_populates='transactions') 
-    category = db.relationship('Category', back_populates='transactions')
-
+    user = db.relationship('User', backref='transactions')

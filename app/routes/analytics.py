@@ -1,24 +1,17 @@
-from flask import Blueprint, request, jsonify
-from app.services.analytics import get_total_income_expense, get_transaction_summary
+from flask import Blueprint, jsonify
+from flask_jwt_extended import jwt_required, get_jwt_identity
+from app.extensions import db
+from app.models.transaction import Transaction
+from sqlalchemy.sql import func
 
-analytics_bp = Blueprint("analytics", __name__)
+analytics_bp = Blueprint('analytics', __name__)
 
-@analytics_bp.route("/summary", methods=["GET"])
-def analytics_summary():
-    user_id = request.args.get("user_id", type=int)
-    if not user_id:
-        return jsonify({"error": "User ID is required"}), 400
+@analytics_bp.route('/summary', methods=['GET'])
+@jwt_required()
+def spending_summary():
+    user_id = get_jwt_identity()
+    
+    total_income = db.session.query(func.sum(Transaction.amount)).filter_by(user_id=user_id, type='income').scalar() or 0
+    total_expense = db.session.query(func.sum(Transaction.amount)).filter_by(user_id=user_id, type='expense').scalar() or 0
 
-    summary = get_total_income_expense(user_id)
-    return jsonify(summary), 200
-
-@analytics_bp.route("/transactions", methods=["GET"])
-def transactions_summary():
-    user_id = request.args.get("user_id", type=int)
-    period = request.args.get("period", "monthly")
-
-    if not user_id:
-        return jsonify({"error": "User ID is required"}), 400
-
-    transactions = get_transaction_summary(user_id, period)
-    return jsonify(transactions), 200
+    return jsonify({"total_income": total_income, "total_expense": total_expense})

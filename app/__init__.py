@@ -1,23 +1,18 @@
 from flask import Flask
-from app.extensions import db
-from app.routes.auth import auth_bp
-from app.routes.transactions import transactions_bp
 from flask_migrate import Migrate
+from app.extensions import db
+from app.routes import transactions_bp, auth_bp  # Import blueprints
 
 def create_app():
     app = Flask(__name__)
-    app.config.from_object("app.config.Config")
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///instance/money_mate.db'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     db.init_app(app)
-    migrate = Migrate(app, db)
-
-    # Import analytics routes AFTER initializing db
-    from app.routes.analytics import analytics_bp  
+    Migrate (app, db)
 
     # Register Blueprints
-    app.register_blueprint(auth_bp, url_prefix="/auth")
     app.register_blueprint(transactions_bp, url_prefix="/transactions")
-    app.register_blueprint(analytics_bp, url_prefix="/analytics") 
+    app.register_blueprint(auth_bp, url_prefix="/auth")
 
     return app
-
