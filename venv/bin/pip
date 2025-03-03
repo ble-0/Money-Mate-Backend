@@ -1,4 +1,4 @@
-#!/home/bleh/Money-Mate-Backend/venv/bin/python
+#!/home/hassan/development/phase-5/Money-Mate-Backend/venv/bin/python3
 # -*- coding: utf-8 -*-
 import re
 import sys

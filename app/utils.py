@@ -1,11 +1,9 @@
-
 import re
 
-def parse_mpesa_sms(sms_content):
-
-    amount_match = re.search(r"received KSh (\d+)", sms_content)
-    if amount_match:
-        amount = float(amount_match.group(1))
-        transaction_type = "deposit"  or "transfered"
-        return amount,  transaction_type
-    return None, None
+def parse_mpesa_message(message):
+    # Example MPesa message format: "Confirmed. Ksh500 sent to John Doe..."
+    match = re.search(r"Ksh(\d+\.?\d*)", message)
+    if match:
+        amount = float(match.group(1))
+        return {"amount": amount, "category": "Unknown", "type": "expense"}
+    return None
