@@ -8,7 +8,7 @@ class Config:
     INSTANCE_DIR = os.path.join(BASE_DIR, 'instance')  # Path to the instance directory
     DATABASE_URL = os.getenv('DATABASE_URL', f"sqlite:///{os.path.join(INSTANCE_DIR, 'money_mate.db')}")
 
-    SQLALCHEMY_DATABASE_URI = "sqlite:///instance/money_mate.db"
+    SQLALCHEMY_DATABASE_URI = "sqlite:///../instance/money_mate.db"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SECRET_KEY = os.getenv('SECRET_KEY', 'supersecretkey')
     DEBUG = os.getenv('FLASK_DEBUG', 'False').lower() in ('true', '1')
