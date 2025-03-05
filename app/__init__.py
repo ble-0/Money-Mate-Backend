@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_cors import CORS
+from flask_jwt_extended import JWTManager
 from app.config import Config
 from app.extensions import db, migrate
 from app.models.category import Category
@@ -11,7 +12,10 @@ def create_app():
     app.config.from_object(Config)
 
     #Enable CORS for all routes
-    CORS(app)
+    CORS(app, supports_credentials=True)
+
+    # Initialize JWTManager
+    jwt = JWTManager(app)
 
     db.init_app(app)
     migrate.init_app(app, db)

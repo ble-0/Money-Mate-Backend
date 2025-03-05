@@ -12,6 +12,7 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SECRET_KEY = os.getenv('SECRET_KEY', 'supersecretkey')
     DEBUG = os.getenv('FLASK_DEBUG', 'False').lower() in ('true', '1')
+    # PERMANENT_SESSION_LIFETIME = timedelta(minutes=60)
 
     @staticmethod
     def ensure_instance_folder():

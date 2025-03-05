@@ -1,4 +1,6 @@
 from flask import Blueprint, request, jsonify
+from flask import session
+from datetime import datetime
 from app.extensions import db
 from app.models.user import User
 
@@ -18,7 +20,10 @@ def signup():
     db.session.add(user)
     db.session.commit()
 
-    return jsonify({"message": "User registered successfully"}), 201
+    # Login the User after signup
+    session['user_id'] = user.id
+    
+    return jsonify({"message": "User registered successfully", "alert": "Signing you in..."}), 201
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
@@ -26,7 +31,29 @@ def login():
     user = User.query.filter_by(email=data.get("email")).first()
     
     if user and user.check_password(data.get("password")):
-        token = user.generate_token()
-        return jsonify({"token": token}), 200
-    
+       session['user_id'] = user.id
+       return jsonify({"message": "Login successful"}), 200
+
+
     return jsonify({"error": "Invalid credentials"}), 401
+
+
+@auth_bp.route('/logout', methods=['POST'])
+def logout():
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({"error": "Not authenticated"}), 401
+    
+    session.clear()# clear the session
+    response = jsonify({"message": "Logged out successfully"})
+
+    return response, 200
+
+@auth_bp.route('/check_auth', methods=['GET'])
+def check_auth():
+    user_id = session.get('user_id')
+    print("Session user_id:", user_id)
+    if user_id:
+        user = User.query.get(user_id)
+        return jsonify({"message": "User is authenticated", "user": user.username }), 200
+    return jsonify({"message": "User is not authenticated"}), 401
