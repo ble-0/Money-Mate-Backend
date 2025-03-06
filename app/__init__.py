@@ -1,5 +1,5 @@
 from flask import Flask
-from flask_session import session
+from flask_session import Session
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from app.config import Config
