@@ -1,3 +1,4 @@
+import os
 from flask import Flask
 from flask_session import Session
 from flask_cors import CORS
@@ -22,6 +23,8 @@ def create_app():
     jwt = JWTManager(app)
 
     # Initialize Flask-Session
+    session_dir = os.path.join(app.instance_path, 'flask_session')  # Define session_dir
+    os.makedirs(session_dir, exist_ok=True)  # Create the directory if it doesn't exist
     app.config['SESSION_TYPE'] = 'filesystem'  # Store sessions on the filesystem
     app.config['SESSION_FILE_DIR'] = session_dir # Directory for session files
     app.config['SESSION_PERMANENT'] = False  # Sessions are not permanent
