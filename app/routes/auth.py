@@ -8,7 +8,7 @@ auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/signup', methods=['POST'])
 def signup():
-    data = request.json
+    data = request.get_json()
     if not all(k in data for k in ["username", "email", "password"]):
         return jsonify({"error": "Missing required fields"}), 400
 
