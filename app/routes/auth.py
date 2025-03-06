@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, session
 from flask_session import Session
 from datetime import datetime
 from app.extensions import db
@@ -15,10 +15,17 @@ def signup():
     if User.query.filter_by(email=data["email"]).first():
         return jsonify({"error": "Email already exists"}), 409
 
-    user = User(username=data["username"], email=data["email"])
-    user.set_password(data["password"])
-    db.session.add(user)
-    db.session.commit()
+    try:
+        # Create a new User object
+        user = User(username=data.get('username'), email=data.get('email'))
+        user.set_password(data["password"])  # hash the password
+        # Add the user to the database
+        db.session.add(user)
+        db.session.commit()
+    except Exception as e:
+        # Rollback in case of an error
+        db.session.rollback()
+        return jsonify({"error": "Failed to register user", "details": str(e)}), 500
 
     # Login the User after signup
     session['user_id'] = user.id
@@ -27,7 +34,7 @@ def signup():
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
-    data = request.json
+    data = request.get_json()
     user = User.query.filter_by(email=data.get("email")).first()
     
     if user and user.check_password(data.get("password")):
