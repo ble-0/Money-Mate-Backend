@@ -1,4 +1,4 @@
-from flask import flask
+from flask import Flask
 from flask_session import session
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
