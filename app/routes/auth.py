@@ -27,8 +27,8 @@ def signup():
         db.session.rollback()
         return jsonify({"error": "Failed to register user", "details": str(e)}), 500
 
-    # Login the User after signup
-    session['user_id'] = user.id
+    # # Login the User after signup
+    # session['user_id'] = user.id
     
     return jsonify({"message": "User registered successfully", "alert": "Signing you in..."}), 201
 
