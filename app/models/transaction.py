@@ -12,4 +12,4 @@ class Transaction(db.Model):
     date = db.Column(db.DateTime, default=datetime.utcnow)
 
     user = db.relationship('User', backref='transactions')
-    category = db.relationship('Category', back_populates='transactions')  
+    category = db.relationship('Category', back_populates='transactions')
