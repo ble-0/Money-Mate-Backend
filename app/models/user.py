@@ -1,5 +1,4 @@
 from app.extensions import db, bcrypt
-from flask_jwt_extended import create_access_token
 from datetime import datetime
 
 class User(db.Model):
