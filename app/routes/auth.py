@@ -12,8 +12,12 @@ def signup():
     if not all(k in data for k in ["username", "email", "password"]):
         return jsonify({"error": "Missing required fields"}), 400
 
+    if User.query.filter_by(username=data["username"]).first():
+        return jsonify({"error": "Username already exists"}), 409
     if User.query.filter_by(email=data["email"]).first():
         return jsonify({"error": "Email already exists"}), 409
+
+
 
     try:
         # Create a new User object
@@ -30,7 +34,7 @@ def signup():
     # # Login the User after signup
     # session['user_id'] = user.id
     
-    return jsonify({"message": "User registered successfully", "alert": "Signing you in..."}), 201
+    return jsonify({"message": "User registered successfully"}), 201
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
