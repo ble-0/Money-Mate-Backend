@@ -13,12 +13,3 @@ class Config:
     SECRET_KEY = os.getenv('SECRET_KEY', 'supersecretkey')
     DEBUG = os.getenv('FLASK_DEBUG', 'False').lower() in ('true', '1')
     # PERMANENT_SESSION_LIFETIME = timedelta(minutes=60)
-
-    @staticmethod
-    def ensure_instance_folder():
-        """Ensure the instance folder exists to prevent SQLite errors."""
-        if not os.path.exists(Config.INSTANCE_DIR):
-            os.makedirs(Config.INSTANCE_DIR)
-
-# Ensure the instance folder exists at runtime
-Config.ensure_instance_folder()
