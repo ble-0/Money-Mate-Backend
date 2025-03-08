@@ -15,7 +15,7 @@ def add_transaction():
         return jsonify({"error": "Missing fields"}), 400
 
     # validate the type field
-    if data["type"] not in ["income", "expense"]:
+    if data["type"] not in ["received", "sent"]:
         return jsonify({"error": "Invalid type field"}), 400
 
     # validate the amount field
