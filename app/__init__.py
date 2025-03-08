@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 from flask import Flask
 from flask_session import Session
 from flask_cors import CORS
@@ -26,15 +27,15 @@ def create_app():
     os.makedirs(session_dir, exist_ok=True)  # Create the directory if it doesn't exist
     app.config['SESSION_TYPE'] = 'filesystem'  # Store sessions on the filesystem
     app.config['SESSION_FILE_DIR'] = session_dir # Directory for session files
-    app.config['SESSION_PERMANENT'] = False  # Sessions are not permanent
+    app.config['SESSION_PERMANENT'] = True  # Sessions are not permanent
     app.config['SESSION_USE_SIGNER'] = True  # Sign the session cookie
-    app.config['SESSION_COOKIE_SECURE'] = True  # Secure the session cookie
+    app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
+    app.config['SESSION_COOKIE_SECURE'] = False  # Secure the session cookie
     Session(app)
+    print(f"Database URI: {app.config['SQLALCHEMY_DATABASE_URI']}")
 
     db.init_app(app)
     migrate.init_app(app, db)
-
-
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(transactions_bp, url_prefix='/transactions')

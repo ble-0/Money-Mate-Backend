@@ -33,7 +33,7 @@ def add_transaction():
     db.session.add(transaction)
     db.session.commit()
 
-    return jsonify({"message": "Transaction added"}), 201
+    return jsonify({"message": "Transaction added succesfully!"}), 201
 
 @transactions_bp.route('/', methods=['GET'])
 def get_transactions():
