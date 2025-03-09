@@ -42,7 +42,9 @@ def login():
     user = User.query.filter_by(email=data.get("email")).first()
     
     if user and user.check_password(data.get("password")):
+       session.clear()
        session['user_id'] = user.id
+       session.modified = True
        print("Session after login:", session)
        return jsonify({"message": "Login successful"}), 200
 
@@ -57,6 +59,7 @@ def logout():
         return jsonify({"error": "Not authenticated"}), 401
     
     session.clear()# clear the session
+    session.modified = True
     response = jsonify({"message": "Logged out successfully"})
 
     return response, 200

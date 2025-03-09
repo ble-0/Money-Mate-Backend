@@ -32,7 +32,6 @@ def create_app():
     app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
     app.config['SESSION_COOKIE_SECURE'] = False  # Secure the session cookie
     Session(app)
-    print(f"Database URI: {app.config['SQLALCHEMY_DATABASE_URI']}")
 
     db.init_app(app)
     migrate.init_app(app, db)
