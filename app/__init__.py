@@ -20,6 +20,9 @@ def create_app():
 
     CORS(app, supports_credentials=True)
 
+    db.init_app(app)
+    migrate.init_app(app, db)
+
 
     app.config['SESSION_TYPE'] = 'sqlalchemy'  
     app.config['SESSION_SQLALCHEMY'] = db
@@ -27,6 +30,7 @@ def create_app():
     app.config['SESSION_USE_SIGNER'] = True  
     app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
     app.config['SESSION_COOKIE_SECURE'] = False 
+
     Session(app)
 
     db.init_app(app)
