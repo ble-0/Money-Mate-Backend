@@ -20,12 +20,9 @@ def create_app():
 
     CORS(app, supports_credentials=True)
 
-    # Set the session file directory to a folder inside the instance directory
-    app.config['SESSION_FILE_DIR'] = os.path.join(app.instance_path, 'flask_session')
-
-
 
     app.config['SESSION_TYPE'] = 'sqlalchemy'  
+    app.config['SESSION_SQLALCHEMY'] = db
     app.config['SESSION_PERMANENT'] = True  
     app.config['SESSION_USE_SIGNER'] = True  
     app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)

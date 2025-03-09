@@ -5,7 +5,10 @@ load_dotenv()  # Load environment variables from .env file
 
 class Config:
     BASE_DIR = os.path.abspath(os.path.dirname(__file__))  # Get absolute path of the project
+    
     DATABASE_URL = os.getenv('DATABASE_URL')
+    if DATABASE_URL and DATABASE_URL.startswith('postgres://'):
+        DATABASE_URL = DATABASE_URL.replace('postgres://', 'postgresql://')
 
     SQLALCHEMY_DATABASE_URI = DATABASE_URL
     SQLALCHEMY_TRACK_MODIFICATIONS = False
