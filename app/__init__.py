@@ -15,22 +15,22 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
-    #Enable CORS for all routes
+    if os.environ.get('DATABASE_URL'):
+        app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL'].replace('postgres://','postgresql://')
+
     CORS(app, supports_credentials=True)
 
     # Set the session file directory to a folder inside the instance directory
     app.config['SESSION_FILE_DIR'] = os.path.join(app.instance_path, 'flask_session')
 
 
-    # Initialize Flask-Session
-    session_dir = os.path.join(app.instance_path, 'flask_session')  # Define session_dir
-    os.makedirs(session_dir, exist_ok=True)  # Create the directory if it doesn't exist
-    app.config['SESSION_TYPE'] = 'filesystem'  # Store sessions on the filesystem
-    app.config['SESSION_FILE_DIR'] = session_dir # Directory for session files
-    app.config['SESSION_PERMANENT'] = True  # Sessions are not permanent
-    app.config['SESSION_USE_SIGNER'] = True  # Sign the session cookie
+
+    app.config['SESSION_TYPE'] = 'sqlalchemy'  
+    app.config['SESSION_FILE_DIR'] = session_dir 
+    app.config['SESSION_PERMANENT'] = True  
+    app.config['SESSION_USE_SIGNER'] = True  
     app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
-    app.config['SESSION_COOKIE_SECURE'] = False  # Secure the session cookie
+    app.config['SESSION_COOKIE_SECURE'] = False 
     Session(app)
 
     db.init_app(app)
