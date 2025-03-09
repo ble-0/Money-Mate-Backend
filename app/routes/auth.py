@@ -39,7 +39,7 @@ def signup():
 @auth_bp.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
-    user = User.query.filter_by(email=data.get("email")).first()
+    user = User.query.filter_by(username=data.get("username")).first()
     
     if user and user.check_password(data.get("password")):
        session.clear()
