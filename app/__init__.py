@@ -33,8 +33,6 @@ def create_app():
 
     Session(app)
 
-    db.init_app(app)
-    migrate.init_app(app, db)
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(transactions_bp, url_prefix='/transactions')
