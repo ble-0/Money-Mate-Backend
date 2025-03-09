@@ -26,7 +26,6 @@ def create_app():
 
 
     app.config['SESSION_TYPE'] = 'sqlalchemy'  
-    app.config['SESSION_FILE_DIR'] = session_dir 
     app.config['SESSION_PERMANENT'] = True  
     app.config['SESSION_USE_SIGNER'] = True  
     app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
