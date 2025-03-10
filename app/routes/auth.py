@@ -31,8 +31,8 @@ def signup():
         db.session.rollback()
         return jsonify({"error": "Failed to register user", "details": str(e)}), 500
 
-    # # Login the User after signup
-    session['user_id'] = user.id
+    # # # Login the User after signup
+    # session['user_id'] = user.id
     
     return jsonify({"message": "User registered successfully"}), 201
 
@@ -42,11 +42,18 @@ def login():
     user = User.query.filter_by(username=data.get("username")).first()
     
     if user and user.check_password(data.get("password")):
-       session.clear()
-       session['user_id'] = user.id
-       session.modified = True
-       print("Session after login:", session)
-       return jsonify({"message": "Login successful"}), 200
+        if user.logged_in:  # Check if the user is already logged in
+            return jsonify({"error": "User is already logged in"}), 403
+
+        user.logged_in = True
+        db.session.commit()
+
+
+        session.clear()
+        session['user_id'] = user.id
+        session.modified = True
+        print("Session after login:", session)
+        return jsonify({"message": "Login successful"}), 200
 
 
     return jsonify({"error": "Invalid credentials"}), 401
@@ -57,6 +64,11 @@ def logout():
     user_id = session.get('user_id')
     if not user_id:
         return jsonify({"error": "Not authenticated"}), 401
+
+    # Log the user out by clearing the session and marking them as not logged in
+    user = User.query.get(user_id)
+    user.logged_in = False  # Set the logged_in flag to False
+    db.session.commit()
     
     session.clear()# clear the session
     session.modified = True
