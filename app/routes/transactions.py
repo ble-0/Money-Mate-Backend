@@ -5,61 +5,49 @@ from app.models.transaction import Transaction
 
 transactions_bp = Blueprint('transactions', __name__)
 
-@transactions_bp.route('/', methods=['POST'])
-def add_transaction():
-    data = request.json
+@main_routes.route('/transactions', methods=['GET', 'POST'])
+def transactions():
+    # Check if the user is logged in
+    if 'user_id' not in session:
+        return jsonify({'message': 'Unauthorized'}), 401
 
-    # Check for required fields
-    required_fields = ["amount", "type", "user_id"]
-    if not all(k in data for k in required_fields):
-        return jsonify({"error": "Missing fields"}), 400
+    if request.method == 'GET':
+        # Handle GET request: Fetch all transactions for the logged-in user
+        transactions = Transaction.query.filter_by(user_id=session['user_id']).all()
+        transaction_list = [{
+            'transaction_id': t.transaction_id,
+            'user_id': t.user_id,  # Include user_id in the response (optional)
+            'amount': t.amount,
+            'date': t.date.isoformat(),
+            'type': t.type
+        } for t in transactions]
 
-    # validate the type field
-    if data["type"] not in ["received", "sent"]:
-        return jsonify({"error": "Invalid type field"}), 400
+        return jsonify(transaction_list), 200
 
-    # validate the amount field
-    if not isinstance(data["amount"], (int, float)) or data["amount"] <= 0:
-        return jsonify({"error": "Invalid amount field"}), 400
+    elif request.method == 'POST':
+        # Handle POST request: Add a new transaction
+        data = request.get_json()
 
+        # Validate required fields
+        if not data or 'amount' not in data or 'date' not in data or 'type' not in data:
+            return jsonify({'message': 'Missing required fields (amount, date, type)'}), 400
 
-    # Create the Transaction instance
-    transaction = Transaction(
-        user_id=data["user_id"],  # Include the user_id from the request
-        amount=data["amount"],
-        type=data["type"]
-    )
+        try:
+            # Parse the date from the frontend format (e.g., "4/16/2021, 7:41:15 PM")
+            transaction_date = datetime.strptime(data['date'], '%m/%d/%Y, %I:%M:%S %p')
+        except ValueError:
+            return jsonify({'message': 'Invalid date format. Use "MM/DD/YYYY, HH:MM:SS AM/PM"'}), 400
 
-    db.session.add(transaction)
-    db.session.commit()
+        # Create a new transaction
+        new_transaction = Transaction(
+            user_id=session['user_id'],  # Set the user_id from the session
+            amount=data['amount'],
+            date=transaction_date,
+            type=data['type']
+        )
 
-    return jsonify({"message": "Transaction added succesfully!"}), 201
+        # Add and commit to the database
+        db.session.add(new_transaction)
+        db.session.commit()
 
-@transactions_bp.route('/', methods=['GET'])
-def get_transactions():
-    # Fetch all transactions (no user filtering since we're not using sessions)
-    transactions = Transaction.query.all()
-
-    # Return the transactions as a JSON response
-    return jsonify([{
-        "id": t.id,
-        "user_id": t.user_id,  # Include user_id
-        "amount": t.amount,
-        "type": t.type,
-        "date": t.date.strftime("%Y-%m-%d")
-    } for t in transactions])
-
-@transactions_bp.route('/<int:id>', methods=['DELETE'])
-def delete_transaction(id):
-    # Fetch the transaction by ID
-    transaction = Transaction.query.get(id)
-
-    # Ensure the transaction exists
-    if not transaction:
-        return jsonify({"error": "Transaction not found"}), 404
-
-    # Delete the transaction from the database
-    db.session.delete(transaction)
-    db.session.commit()
-
-    return jsonify({"message": "Transaction deleted"}), 200
+        return jsonify({'message': 'Transaction added successfully', 'transaction_id': new_transaction.transaction_id}), 201

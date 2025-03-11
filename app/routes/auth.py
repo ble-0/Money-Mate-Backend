@@ -9,6 +9,9 @@ auth_bp = Blueprint('auth', __name__)
 @auth_bp.route('/signup', methods=['POST'])
 def signup():
     data = request.get_json()
+    username = data.get('username')
+    email = data.get('email')
+    password = data.get('password')
     if not all(k in data for k in ["username", "email", "password"]):
         return jsonify({"error": "Missing required fields"}), 400
 
@@ -40,24 +43,20 @@ def signup():
 # 
 def login():
     data = request.get_json()
+
+    username = data.get('username')  # Get username from the request
+    password = data.get('password')  # Get password from the request
+
     user = User.query.filter_by(username=data.get("username")).first()
     
-    if user and user.check_password(data.get("password")):
-        if user.logged_in:  # Check if the user is already logged in
-            return jsonify({"error": "User is already logged in"}), 403
-
-        user.logged_in = True
-        db.session.commit()
-
-
-        session.clear()
-        session['user_id'] = user.id
-        session.modified = True
-        print("Session after login:", session)
-        return jsonify({"message": "Login successful"}), 200
-
-
-    return jsonify({"error": "Invalid credentials"}), 401
+    # Check if the user exists and the password is correct
+    if user and user.check_password(password):
+        # Store the user's ID in the session
+        session['user_id'] = user.user_id
+        session.permanent = True  # Make the session permanent
+        return jsonify({'success': True, 'message': 'Login successful'}), 200
+    else:
+        return jsonify({'success': False, 'message': 'Invalid username or password'}), 401
 
 
 @auth_bp.route('/logout', methods=['POST'])
