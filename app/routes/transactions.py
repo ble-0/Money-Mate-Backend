@@ -4,6 +4,7 @@ from app.models.transaction import Transaction
 
 
 transactions_bp = Blueprint('transactions', __name__)
+main_routes = Blueprint('main_routes', __name__)
 
 @main_routes.route('/transactions', methods=['GET', 'POST'])
 def transactions():
