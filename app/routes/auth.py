@@ -36,7 +36,8 @@ def signup():
     
     return jsonify({"message": "User registered successfully"}), 201
 
-@auth_bp.route('/login', methods=['POST'])
+@auth_bp.route('/login', methods=['POST','GET'])
+# 
 def login():
     data = request.get_json()
     user = User.query.filter_by(username=data.get("username")).first()
