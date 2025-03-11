@@ -12,15 +12,15 @@ def signup():
     username = data.get('username')
     email = data.get('email')
     password = data.get('password')
+
     if not all(k in data for k in ["username", "email", "password"]):
         return jsonify({"error": "Missing required fields"}), 400
 
+    # Check if the username or email already exists
     if User.query.filter_by(username=data["username"]).first():
         return jsonify({"error": "Username already exists"}), 409
     if User.query.filter_by(email=data["email"]).first():
         return jsonify({"error": "Email already exists"}), 409
-
-
 
     try:
         # Create a new User object
@@ -29,35 +29,36 @@ def signup():
         # Add the user to the database
         db.session.add(user)
         db.session.commit()
+        
+        # Login the User after signup (store user id in session)
+        session['user_id'] = user.id  # Store user id in session
+        session.permanent = True  # Make session permanent
+
     except Exception as e:
         # Rollback in case of an error
         db.session.rollback()
         return jsonify({"error": "Failed to register user", "details": str(e)}), 500
 
-    # # # Login the User after signup
-    # session['user_id'] = user.id
-    
-    return jsonify({"message": "User registered successfully"}), 201
+    return jsonify({"message": "User registered successfully", "user_id": user.id}), 201
 
-@auth_bp.route('/login', methods=['POST','GET'])
-# 
+
+@auth_bp.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
 
     username = data.get('username')  # Get username from the request
     password = data.get('password')  # Get password from the request
 
-    user = User.query.filter_by(username=data.get("username")).first()
-    
-    # Check if the user exists and the password is correct
+    # Query the user by username
+    user = User.query.filter_by(username=username).first()
+
     if user and user.check_password(password):
-        # Store the user's ID in the session
-        session['user_id'] = user.user_id
-        session.permanent = True  # Make the session permanent
+        # Check if the password is correct
+        session['user_id'] = user.id  # Store user id in session
+        session.permanent = True  # Make session permanent
         return jsonify({'success': True, 'message': 'Login successful'}), 200
     else:
         return jsonify({'success': False, 'message': 'Invalid username or password'}), 401
-
 
 @auth_bp.route('/logout', methods=['POST'])
 def logout():

@@ -1,4 +1,5 @@
 import os
+from app.routes.transactions import main_routes 
 from datetime import timedelta
 from flask import Flask
 from dotenv import load_dotenv
@@ -43,6 +44,7 @@ def create_app():
     from app.routes.auth import auth_bp
     from app.routes.transactions import transactions_bp
     app.register_blueprint(auth_bp)
+    app.register_blueprint(main_routes)
     app.register_blueprint(transactions_bp, url_prefix='/transactions')
 
     # Create all tables (for local testing)
