@@ -50,7 +50,7 @@ def login():
     # Query the user by username
     user = User.query.filter_by(username=username).first()
 
-    if user 
+    if user:
         session['user_id'] = user.id  # Store user id in session
         session.permanent = True  # Make session permanent
         return jsonify({'success': True, 'message': 'Login successful'}), 200
