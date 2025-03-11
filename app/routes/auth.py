@@ -25,7 +25,6 @@ def signup():
     try:
         # Create a new User object
         user = User(username=data.get('username'), email=data.get('email'))
-        user.set_password(data["password"])  # hash the password
         # Add the user to the database
         db.session.add(user)
         db.session.commit()
@@ -52,8 +51,7 @@ def login():
     # Query the user by username
     user = User.query.filter_by(username=username).first()
 
-    if user and user.check_password(password):
-        # Check if the password is correct
+    if user 
         session['user_id'] = user.id  # Store user id in session
         session.permanent = True  # Make session permanent
         return jsonify({'success': True, 'message': 'Login successful'}), 200
